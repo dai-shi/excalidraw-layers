@@ -1,0 +1,42 @@
+diff --git a/src/i18n.ts b/src/i18n.ts
+index 474d87a..cb4ac6d 100644
+--- a/src/i18n.ts
++++ b/src/i18n.ts
+@@ -48,7 +48,9 @@ export const setLanguage = (newLng: string | undefined) => {
+   currentLanguage =
+     languages.find((language) => language.lng === newLng) || fallbackLanguage;
+ 
+-  document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
++  try {
++    document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
++  } catch (e) {}
+ 
+   languageDetector.cacheUserLanguage(currentLanguage.lng);
+ };
+diff --git a/src/keys.ts b/src/keys.ts
+index 3b181ad..7bf039f 100644
+--- a/src/keys.ts
++++ b/src/keys.ts
+@@ -1,4 +1,6 @@
+-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform);
++export const isDarwin = /Mac|iPod|iPhone|iPad/.test(
++  typeof window !== "undefined" ? window.navigator.platform : "",
++);
+ 
+ export const KEYS = {
+   ARROW_LEFT: "ArrowLeft",
+diff --git a/src/renderer/renderElement.ts b/src/renderer/renderElement.ts
+index 95fdaa6..939d790 100644
+--- a/src/renderer/renderElement.ts
++++ b/src/renderer/renderElement.ts
+@@ -113,7 +113,9 @@ const drawElementOnCanvas = (
+           //  to the DOM
+           document.body.appendChild(context.canvas);
+         }
+-        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
++        try {
++          context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
++        } catch (e) {}
+         const font = context.font;
+         context.font = getFontString(element);
+         const fillStyle = context.fillStyle;
