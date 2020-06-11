@@ -39,6 +39,8 @@ const getElementCanvas = (
   return canvas;
 };
 
+let render: (viewAngle: number) => void = () => undefined;
+
 const init = (
   canvas: HTMLCanvasElement,
   scale: number,
@@ -52,18 +54,10 @@ const init = (
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
   renderer.setSize(width, height);
   const scene = new THREE.Scene();
-  const camera = new THREE.OrthographicCamera(
-    -width / 2,
-    width / 2,
-    height / 2,
-    -height / 2,
-    1,
-    1000
-  );
   const light = new THREE.AmbientLight(0xffffff);
   scene.add(light);
 
-  elements.forEach((element) => {
+  elements.forEach((element, index) => {
     const elementCanvas = getElementCanvas(scale, element);
     const [x1, y1, x2, y2] = getElementBounds(element);
     const w = (x2 - x1 + CANVAS_PADDING * 2) * scale;
@@ -79,12 +73,27 @@ const init = (
     scene.add(cube);
     cube.position.set(
       scrollX + x1 + (x2 - x1) / 2 - width / 2,
-      -(scrollY + y1 + (y2 - y1) / 2 ) + height / 2,
-      -1
+      -(scrollY + y1 + (y2 - y1) / 2) + height / 2,
+      height / 4 - (height / 2 / elements.length) * index
     );
   });
 
-  renderer.render(scene, camera);
+  const camera = new THREE.OrthographicCamera(
+    -width / 2,
+    width / 2,
+    height / 2,
+    -height / 2,
+    0,
+    height
+  );
+
+  render = (viewAngle: number) => {
+    camera.position.z = (height / 2) * Math.cos(viewAngle);
+    camera.position.y = (height / 2) * Math.sin(viewAngle);
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+  };
+  render(0);
 };
 
 self.onmessage = (event: MessageEvent) => {
@@ -111,6 +120,8 @@ self.onmessage = (event: MessageEvent) => {
         data.elements
       );
     });
+  } else if (data.type === "render") {
+    render(data.viewAngle);
   } else {
     console.log("unknown data", data);
   }

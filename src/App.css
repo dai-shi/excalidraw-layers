@@ -1,2 +1,6 @@
 .App {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 100vw;
+  height: 100vh;
 }
