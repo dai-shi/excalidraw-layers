@@ -7,7 +7,7 @@ This is an experimental tool to view layers of
 
 ## How to use it
 
-Just visit <https://dai-shi.github.io/excalidra-layers>
+Just visit <https://dai-shi.github.io/excalidraw-layers>
 
 and enter the link in the field and click "View Layers!"
 
