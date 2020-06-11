@@ -35,6 +35,7 @@
     "react-scripts": "3.4.1",
     "roughjs": "^4.3.1",
     "socket.io-client": "^2.3.0",
+    "three": "^0.117.1",
     "typescript": "^3.9.3",
     "worker-plugin": "^4.0.3"
   },
@@ -47,7 +48,7 @@
     "test:lint": "eslint --max-warnings=0 --ignore-path .gitignore  --ext .js,.ts,.tsx .",
     "test:format": "prettier 'src/*.(js|ts|tsx|css|scss)' --list-different",
     "test:app": "react-app-rewired test --env=jsdom --passWithNoTests",
-    "preinstall": "git submodule update --init --recursive; (cd src/excalidraw; patch -p1 < ../../excalidraw.patch)"
+    "preinstall": "git submodule update --init --recursive; (cd src/excalidraw; patch -N -p1 < ../../excalidraw.patch); true"
   },
   "eslintConfig": {
     "extends": "react-app"

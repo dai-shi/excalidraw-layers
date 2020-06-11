@@ -1,6 +1,7 @@
 /* eslint no-restricted-globals: off */
 
 import rough from "roughjs/bin/rough";
+import * as THREE from "three";
 
 import { NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
 import { SceneState } from "./excalidraw/src/scene/types";
@@ -37,33 +38,52 @@ const getElementCanvas = (
   return canvas;
 };
 
-const render = (
+const init = (
   canvas: HTMLCanvasElement,
   scale: number,
+  width: number,
+  height: number,
   scrollX: number,
   scrollY: number,
   elements: readonly NonDeletedExcalidrawElement[]
 ) => {
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("Failed to get canvas context");
-  context.scale(scale, scale);
+  (canvas as any).style = { width: 0, height: 0 };
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  renderer.setSize(width, height);
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(
+    -width / 2,
+    width / 2,
+    height / 2,
+    -height / 2,
+    1,
+    1000
+  );
+  const light = new THREE.AmbientLight(0xffffff);
+  scene.add(light);
+
   elements.forEach((element) => {
     const elementCanvas = getElementCanvas(scale, element);
     const [x1, y1, x2, y2] = getElementBounds(element);
     const w = (x2 - x1 + CANVAS_PADDING * 2) * scale;
     const h = (y2 - y1 + CANVAS_PADDING * 2) * scale;
-    context.drawImage(
-      elementCanvas,
-      0,
-      0,
-      w,
-      h,
-      scrollX + x1 - CANVAS_PADDING,
-      scrollY + y1 - CANVAS_PADDING,
-      w / scale,
-      h / scale
+    const texture = new THREE.CanvasTexture(elementCanvas);
+    texture.needsUpdate = false;
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+    });
+    const geometry = new THREE.PlaneGeometry(w / scale, h / scale);
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    cube.position.set(
+      scrollX + x1 + (x2 - x1) / 2 - width / 2,
+      -(scrollY + y1 + (y2 - y1) / 2 ) + height / 2,
+      -1
     );
   });
+
+  renderer.render(scene, camera);
 };
 
 self.onmessage = (event: MessageEvent) => {
@@ -80,9 +100,11 @@ self.onmessage = (event: MessageEvent) => {
     (self as any).fonts.add(fontFace1);
     (self as any).fonts.add(fontFace2);
     Promise.all([fontFace1.load(), fontFace2.load()]).then(() => {
-      render(
+      init(
         data.offscreen,
         data.scale,
+        data.width,
+        data.height,
         data.scrollX,
         data.scrollY,
         data.elements

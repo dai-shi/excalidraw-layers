@@ -26,7 +26,16 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       const scrollX = normalizeScroll(-minX + exportPadding);
       const scrollY = normalizeScroll(-minY + exportPadding);
       worker.postMessage(
-        { type: "init", offscreen, scale, scrollX, scrollY, elements },
+        {
+          type: "init",
+          offscreen,
+          scale,
+          width,
+          height,
+          scrollX,
+          scrollY,
+          elements,
+        },
         [offscreen]
       );
       return () => {
