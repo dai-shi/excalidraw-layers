@@ -19,6 +19,7 @@ const getElementCanvas = (
     (x2 - x1 + CANVAS_PADDING * 2) * scale,
     (y2 - y1 + CANVAS_PADDING * 2) * scale
   ) as unknown) as HTMLCanvasElement;
+  canvas.setAttribute = () => undefined;
   const sceneState: SceneState = {
     viewBackgroundColor: null,
     scrollX: (-x1 + CANVAS_PADDING) as any,
