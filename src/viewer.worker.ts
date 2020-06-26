@@ -74,7 +74,7 @@ const init = (
     cube.position.set(
       scrollX + x1 + (x2 - x1) / 2 - width / 2,
       -(scrollY + y1 + (y2 - y1) / 2) + height / 2,
-      height / 4 - (height / 2 / elements.length) * index
+      -height / 4 + (height / 2 / elements.length) * index
     );
   });
 
@@ -89,7 +89,7 @@ const init = (
 
   render = (viewAngle: number) => {
     camera.position.z = (height / 2) * Math.cos(viewAngle);
-    camera.position.y = (height / 2) * Math.sin(viewAngle);
+    camera.position.y = -(height / 2) * Math.sin(viewAngle);
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
   };
