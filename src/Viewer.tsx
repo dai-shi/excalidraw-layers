@@ -42,12 +42,14 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       let zoom = 1;
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
-        if (e.shiftKey) {
-          zoom += e.deltaY / 1000;
+        if (e.ctrlKey) {
+          zoom -= e.deltaY / 100;
           zoom = Math.max(0.2, Math.min(5, zoom));
-        } else {
+        } else if (e.shiftKey){
           viewAngle += e.deltaY / 1000;
           viewAngle = Math.max(0, Math.min(Math.PI / 2, viewAngle));
+        } else {
+          return;
         }
         worker.postMessage({ type: "render", viewAngle, zoom });
       };
