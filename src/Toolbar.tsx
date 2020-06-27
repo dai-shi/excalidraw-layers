@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 import "./Toolbar.css";
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./excalidraw/src/element/types";
 import { loadFromJSON } from "./excalidraw/src/data/json";
 
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;

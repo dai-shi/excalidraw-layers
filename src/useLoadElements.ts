@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import { importFromBackend } from "./excalidraw/src/data";
 import { getNonDeletedElements } from "./excalidraw/src/element";
-import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "./excalidraw/src/element/types";
 
 export const useLoadElements = () => {
   const [loading, setLoading] = useState(true);
@@ -13,7 +16,9 @@ export const useLoadElements = () => {
   const loadData = useCallback(
     (data: { elements: readonly ExcalidrawElement[] }) => {
       setElements(getNonDeletedElements(data.elements));
-    },[]);
+    },
+    []
+  );
 
   useEffect(() => {
     (async () => {
