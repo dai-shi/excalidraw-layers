@@ -40,18 +40,35 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       );
       let viewAngle = 0;
       let zoom = 1;
+      let centerX = 0;
+      let centerY = 0;
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
         if (e.ctrlKey) {
           zoom -= e.deltaY / 100;
           zoom = Math.max(0.2, Math.min(5, zoom));
-        } else if (e.shiftKey){
+        } else if (e.shiftKey) {
           viewAngle += e.deltaY / 1000;
           viewAngle = Math.max(0, Math.min(Math.PI / 2, viewAngle));
         } else {
-          return;
+          centerX += e.deltaX / zoom;
+          centerY -= e.deltaY / zoom;
         }
-        worker.postMessage({ type: "render", viewAngle, zoom });
+        centerX = Math.max(
+          (-width / 2) * (1 + 1 / zoom),
+          Math.min((width / 2) * (1 + 1 / zoom), centerX)
+        );
+        centerY = Math.max(
+          (-height / 2) * (1 + 1 / zoom),
+          Math.min((height / 2) * (1 + 1 / zoom), centerY)
+        );
+        worker.postMessage({
+          type: "render",
+          viewAngle,
+          zoom,
+          centerX,
+          centerY,
+        });
       };
       canvas.addEventListener("wheel", onWheel, { passive: false });
       return () => {
