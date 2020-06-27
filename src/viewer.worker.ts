@@ -52,6 +52,7 @@ const init = (
 ) => {
   (canvas as any).style = { width: 0, height: 0 };
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  renderer.setPixelRatio(scale);
   renderer.setSize(width, height);
   const scene = new THREE.Scene();
   const light = new THREE.AmbientLight(0xffffff);
@@ -60,15 +61,15 @@ const init = (
   elements.forEach((element, index) => {
     const elementCanvas = getElementCanvas(scale, element);
     const [x1, y1, x2, y2] = getElementBounds(element);
-    const w = (x2 - x1 + CANVAS_PADDING * 2) * scale;
-    const h = (y2 - y1 + CANVAS_PADDING * 2) * scale;
+    const w = (x2 - x1 + CANVAS_PADDING * 2);
+    const h = (y2 - y1 + CANVAS_PADDING * 2);
     const texture = new THREE.CanvasTexture(elementCanvas);
     texture.needsUpdate = false;
     const material = new THREE.MeshBasicMaterial({
       map: texture,
       transparent: true,
     });
-    const geometry = new THREE.PlaneGeometry(w / scale, h / scale);
+    const geometry = new THREE.PlaneGeometry(w, h);
     const cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
     cube.position.set(
