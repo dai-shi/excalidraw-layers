@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 
 import "./Toolbar.css";
+import { ExcalidrawElement, NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
+import { loadFromJSON } from "./excalidraw/src/data/json";
 
-type Props = {};
+const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
 
-const Toolbar: React.FC<Props> = () => {
+type Props = {
+  elements: NonDeletedExcalidrawElement[];
+  loadData: (data: { elements: readonly ExcalidrawElement[] }) => void;
+};
+
+const Toolbar: React.FC<Props> = ({ elements, loadData }) => {
   const [showToolbar, setShowToolbar] = useState(false);
+  const [link, setLink] = useState("");
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -19,11 +27,14 @@ const Toolbar: React.FC<Props> = () => {
     return null;
   }
 
+  const loadFile = async () => {
+    const data = await loadFromJSON();
+    loadData(data);
+  };
+
   const loadLink = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const match = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/.exec(
-      (event.target as any).link.value /* FIXME no-any */
-    );
+    const match = linkRegex.exec(link);
     if (!match) {
       window.alert("Invalid link");
       return;
@@ -34,12 +45,19 @@ const Toolbar: React.FC<Props> = () => {
 
   return (
     <div className="Toolbar">
+      <button type="button" onClick={loadFile} disabled={!!elements}>
+        Load File
+      </button>
+      <span>OR</span>
       <form onSubmit={loadLink}>
-        <label>
-          Excalidraw shareable link:
-          <input name="link" />
-        </label>
-        <button type="submit">View Layers!</button>
+        <input
+          placeholder="Enter shareable link..."
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+        />
+        <button type="submit" disabled={!linkRegex.test(link)}>
+          View
+        </button>
       </form>
     </div>
   );

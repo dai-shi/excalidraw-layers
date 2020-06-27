@@ -6,13 +6,13 @@ import Viewer from "./Viewer";
 import { useLoadElements } from "./useLoadElements";
 
 const App: React.FC = () => {
-  const { loading, elements } = useLoadElements();
+  const { loading, elements, loadData } = useLoadElements();
   if (loading) {
     return <div>Loading...</div>;
   }
   return (
     <div className="App">
-      <Toolbar />
+      <Toolbar elements={elements} loadData={loadData} />
       {elements && <Viewer elements={elements} />}
     </div>
   );

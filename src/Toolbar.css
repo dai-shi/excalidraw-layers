@@ -1,14 +1,16 @@
 .Toolbar {
+  margin: 3px;
 }
 
 .Toolbar form {
-  margin: 3px;
+  display: inline;
 }
 
 .Toolbar input {
   margin-left: 3px;
+  margin-right: 3px;
 }
 
 .Toolbar button {
-  margin-left: 3px;
+  margin-right: 3px;
 }
