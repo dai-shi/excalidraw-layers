@@ -7,7 +7,7 @@ import { loadFromJSON } from "./excalidraw/src/data/json";
 const linkRegex = /#json=([0-9]+),?([a-zA-Z0-9_-]*)/;
 
 type Props = {
-  elements: NonDeletedExcalidrawElement[];
+  elements?: readonly NonDeletedExcalidrawElement[];
   loadData: (data: { elements: readonly ExcalidrawElement[] }) => void;
 };
 
