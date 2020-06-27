@@ -39,11 +39,17 @@ const Viewer: React.FC<Props> = ({ elements }) => {
         [offscreen]
       );
       let viewAngle = 0;
+      let zoom = 1;
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
-        viewAngle += e.deltaY / 1000;
-        viewAngle = Math.max(0, Math.min(Math.PI / 2, viewAngle));
-        worker.postMessage({ type: "render", viewAngle });
+        if (e.shiftKey) {
+          zoom += e.deltaY / 1000;
+          zoom = Math.max(0.2, Math.min(5, zoom));
+        } else {
+          viewAngle += e.deltaY / 1000;
+          viewAngle = Math.max(0, Math.min(Math.PI / 2, viewAngle));
+        }
+        worker.postMessage({ type: "render", viewAngle, zoom });
       };
       canvas.addEventListener("wheel", onWheel, { passive: false });
       return () => {

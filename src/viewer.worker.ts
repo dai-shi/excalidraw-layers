@@ -39,7 +39,7 @@ const getElementCanvas = (
   return canvas;
 };
 
-let render: (viewAngle: number) => void = () => undefined;
+let render: (viewAngle: number, zoom: number) => void = () => undefined;
 
 const init = (
   canvas: HTMLCanvasElement,
@@ -87,13 +87,15 @@ const init = (
     height
   );
 
-  render = (viewAngle: number) => {
+  render = (viewAngle: number, zoom: number) => {
+    camera.zoom = zoom;
+    camera.updateProjectionMatrix();
     camera.position.z = (height / 2) * Math.cos(viewAngle);
     camera.position.y = -(height / 2) * Math.sin(viewAngle);
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
   };
-  render(0);
+  render(0, 1);
 };
 
 self.onmessage = (event: MessageEvent) => {
@@ -121,7 +123,7 @@ self.onmessage = (event: MessageEvent) => {
       );
     });
   } else if (data.type === "render") {
-    render(data.viewAngle);
+    render(data.viewAngle, data.zoom);
   } else {
     console.log("unknown data", data);
   }
