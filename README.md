@@ -15,6 +15,8 @@ Just visit <https://dai-shi.github.io/excalidraw-layers>
 
 and enter the link in the field and click "View Layers!"
 
+You can then Shift-scroll to change view angle to see layers.
+
 ## Tweets
 
 - [Initial Annoucement](https://twitter.com/dai_shi/status/1271080071613149185)
