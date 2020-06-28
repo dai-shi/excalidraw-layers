@@ -10,16 +10,14 @@ import { getElementBounds } from "./excalidraw/src/element/bounds";
 
 const CANVAS_PADDING = 20;
 
-const getElementCanvas = (
-  scale: number,
-  element: NonDeletedExcalidrawElement
+const drawElementCanvas = (
+  element: NonDeletedExcalidrawElement,
+  canvas: HTMLCanvasElement,
+  scale: number
 ) => {
   const [x1, y1, x2, y2] = getElementBounds(element);
-  const canvas = (new OffscreenCanvas(
-    (x2 - x1 + CANVAS_PADDING * 2) * scale,
-    (y2 - y1 + CANVAS_PADDING * 2) * scale
-  ) as unknown) as HTMLCanvasElement;
-  canvas.setAttribute = () => undefined;
+  canvas.width = (x2 - x1 + CANVAS_PADDING * 2) * scale;
+  canvas.height = (y2 - y1 + CANVAS_PADDING * 2) * scale;
   const sceneState: SceneState = {
     viewBackgroundColor: null,
     scrollX: (-x1 + CANVAS_PADDING) as any,
@@ -36,7 +34,6 @@ const getElementCanvas = (
   const rc = rough.canvas(canvas);
   const renderOptimizations = false;
   renderElement(element, rc, context, renderOptimizations, sceneState);
-  return canvas;
 };
 
 let render: (
@@ -63,13 +60,25 @@ const init = (
   const light = new THREE.AmbientLight(0xffffff);
   scene.add(light);
 
+  const elementCanvases: {
+    elementCanvas: HTMLCanvasElement;
+    texture: THREE.CanvasTexture;
+  }[] = [];
   elements.forEach((element, index) => {
-    const elementCanvas = getElementCanvas(scale, element);
+    const elementCanvas = (new OffscreenCanvas(
+      0,
+      0
+    ) as unknown) as HTMLCanvasElement;
+    drawElementCanvas(element, elementCanvas, scale);
     const [x1, y1, x2, y2] = getElementBounds(element);
     const w = x2 - x1 + CANVAS_PADDING * 2;
     const h = y2 - y1 + CANVAS_PADDING * 2;
     const texture = new THREE.CanvasTexture(elementCanvas);
-    texture.needsUpdate = false;
+    texture.minFilter = THREE.LinearFilter;
+    elementCanvases[index] = {
+      elementCanvas,
+      texture,
+    };
     const material = new THREE.MeshBasicMaterial({
       map: texture,
       transparent: true,
@@ -93,6 +102,26 @@ const init = (
     height
   );
 
+  let currZoom = 1;
+  const redrawElements = (index: number, zoom: number) => {
+    if (zoom !== currZoom) {
+      // no longer valid
+      return;
+    }
+    if (index >= elements.length) {
+      // rerender
+      renderer.render(scene, camera);
+      return;
+    }
+    const element = elements[index];
+    const { elementCanvas, texture } = elementCanvases[index];
+    drawElementCanvas(element, elementCanvas, scale * zoom);
+    texture.needsUpdate = true;
+    setTimeout(() => {
+      redrawElements(index + 1, zoom);
+    }, 0);
+  };
+
   render = (
     viewAngle: number,
     zoom: number,
@@ -109,8 +138,12 @@ const init = (
     camera.position.y = -(height / 2) * Math.sin(viewAngle);
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
+    if (currZoom !== zoom) {
+      currZoom = zoom;
+      redrawElements(0, zoom);
+    }
   };
-  render(0, 1, 0, 0);
+  render(0, currZoom, 0, 0);
 };
 
 self.onmessage = (event: MessageEvent) => {

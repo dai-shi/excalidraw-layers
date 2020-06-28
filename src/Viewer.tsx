@@ -46,7 +46,7 @@ const Viewer: React.FC<Props> = ({ elements }) => {
         e.preventDefault();
         if (e.ctrlKey) {
           zoom -= e.deltaY / 100;
-          zoom = Math.max(0.2, Math.min(5, zoom));
+          zoom = Math.max(0.1, Math.min(2, zoom));
         } else if (e.shiftKey) {
           viewAngle += e.deltaY / 1000;
           viewAngle = Math.max(0, Math.min(Math.PI / 2, viewAngle));
