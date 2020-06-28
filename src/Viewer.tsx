@@ -23,8 +23,9 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       const scale = window.devicePixelRatio;
       const [minX, minY] = getCommonBounds(elements);
       const exportPadding = 10;
+      const toolbarHeight = 27;
       const scrollX = Math.floor(-minX + exportPadding);
-      const scrollY = Math.floor(-minY + exportPadding);
+      const scrollY = Math.floor(-minY + exportPadding + toolbarHeight);
       worker.postMessage(
         {
           type: "init",

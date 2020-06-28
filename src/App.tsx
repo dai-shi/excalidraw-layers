@@ -12,8 +12,8 @@ const App: React.FC = () => {
   }
   return (
     <div className="App">
-      <Toolbar elements={elements} loadData={loadData} />
       {elements && <Viewer elements={elements} />}
+      <Toolbar elements={elements} loadData={loadData} />
     </div>
   );
 };

@@ -1,5 +1,9 @@
 .Toolbar {
-  margin: 3px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 3px;
+  background-color: white;
 }
 
 .Toolbar form {
