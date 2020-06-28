@@ -46,7 +46,7 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
         if (e.ctrlKey) {
-          zoom -= e.deltaY / 100;
+          zoom -= e.deltaY / 200;
           zoom = Math.max(0.1, Math.min(2, zoom));
         } else if (e.shiftKey) {
           viewAngle += e.deltaY / 1000;
@@ -55,14 +55,6 @@ const Viewer: React.FC<Props> = ({ elements }) => {
           centerX += e.deltaX / zoom;
           centerY -= e.deltaY / zoom;
         }
-        centerX = Math.max(
-          (-width / 2) * (1 + 1 / zoom),
-          Math.min((width / 2) * (1 + 1 / zoom), centerX)
-        );
-        centerY = Math.max(
-          (-height / 2) * (1 + 1 / zoom),
-          Math.min((height / 2) * (1 + 1 / zoom), centerY)
-        );
         worker.postMessage({
           type: "render",
           viewAngle,
