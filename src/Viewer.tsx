@@ -19,10 +19,10 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       const exportPadding = 10;
       const width = maxX - minX + exportPadding * 2;
       const height = maxY - minY + exportPadding * 2;
-      const scale = window.devicePixelRatio;
-      canvas.width = width * scale;
-      canvas.height = height * scale;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       const offscreen = canvas.transferControlToOffscreen();
+      const scale = window.devicePixelRatio;
       const scrollX = Math.floor(-minX + exportPadding);
       const scrollY = Math.floor(-minY + exportPadding);
       worker.postMessage(
