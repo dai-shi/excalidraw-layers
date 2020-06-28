@@ -14,15 +14,15 @@ const Viewer: React.FC<Props> = ({ elements }) => {
   useEffect(() => {
     if (canvasRef.current) {
       const canvas = canvasRef.current;
+      const width = canvas.parentElement?.clientWidth || 300;
+      const height = canvas.parentElement?.clientHeight || 300;
       const worker = new Worker("./viewer.worker", { type: "module" });
-      const [minX, minY, maxX, maxY] = getCommonBounds(elements);
-      const exportPadding = 10;
-      const width = maxX - minX + exportPadding * 2;
-      const height = maxY - minY + exportPadding * 2;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       const offscreen = canvas.transferControlToOffscreen();
       const scale = window.devicePixelRatio;
+      const [minX, minY] = getCommonBounds(elements);
+      const exportPadding = 10;
       const scrollX = Math.floor(-minX + exportPadding);
       const scrollY = Math.floor(-minY + exportPadding);
       worker.postMessage(
