@@ -2,6 +2,7 @@
 
 import rough from "roughjs/bin/rough";
 import * as THREE from "three";
+import throttle from "lodash.throttle";
 
 import { NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
 import { SceneState } from "./excalidraw/src/scene/types";
@@ -119,30 +120,28 @@ const init = (
     texture.needsUpdate = true;
     setTimeout(() => {
       redrawElements(index + 1, zoom);
-    }, 0);
+    }, 1);
   };
 
-  render = (
-    viewAngle: number,
-    zoom: number,
-    centerX: number,
-    centerY: number
-  ) => {
-    camera.zoom = zoom;
-    camera.left = -width / 2 + centerX;
-    camera.right = width / 2 + centerX;
-    camera.top = height / 2 + centerY;
-    camera.bottom = -height / 2 + centerY;
-    camera.updateProjectionMatrix();
-    camera.position.z = (height / 2) * Math.cos(viewAngle);
-    camera.position.y = -(height / 2) * Math.sin(viewAngle);
-    camera.lookAt(0, 0, 0);
-    renderer.render(scene, camera);
-    if (currZoom !== zoom) {
-      currZoom = zoom;
-      redrawElements(0, zoom);
-    }
-  };
+  render = throttle(
+    (viewAngle: number, zoom: number, centerX: number, centerY: number) => {
+      camera.zoom = zoom;
+      camera.left = -width / 2 + centerX;
+      camera.right = width / 2 + centerX;
+      camera.top = height / 2 + centerY;
+      camera.bottom = -height / 2 + centerY;
+      camera.updateProjectionMatrix();
+      camera.position.z = (height / 2) * Math.cos(viewAngle);
+      camera.position.y = -(height / 2) * Math.sin(viewAngle);
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
+      if (currZoom !== zoom) {
+        currZoom = zoom;
+        redrawElements(0, zoom);
+      }
+    },
+    50
+  );
   render(0, currZoom, 0, 0);
 };
 

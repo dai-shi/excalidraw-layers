@@ -46,7 +46,7 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       const onWheel = (e: WheelEvent) => {
         e.preventDefault();
         if (e.ctrlKey) {
-          zoom -= e.deltaY / 200;
+          zoom -= e.deltaY / 100;
           zoom = Math.max(0.1, Math.min(2, zoom));
         } else if (e.shiftKey) {
           viewAngle += e.deltaY / 1000;
