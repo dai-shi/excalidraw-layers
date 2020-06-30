@@ -75,6 +75,7 @@ const init = (
       0,
       0
     ) as unknown) as HTMLCanvasElement;
+    elementCanvas.setAttribute = () => undefined;
     drawElementCanvas(element, elementCanvas, scale);
     const [x1, y1, x2, y2] = getElementBounds(element);
     const w = x2 - x1 + CANVAS_PADDING * 2;
@@ -118,12 +119,11 @@ const init = (
       if (lastZoom === zoom) return false;
       const { width, height } = geometry.parameters;
       const { x, y } = cube.position;
-      const needsResizing = (
+      const needsResizing =
         Math.abs(x - (camera.left + camera.right) / 2) - width / 2 <
           (camera.right - camera.left) / 2 / camera.zoom &&
         Math.abs(y - (camera.bottom + camera.top) / 2) - height / 2 <
-          (camera.top - camera.bottom) / 2 / camera.zoom
-      );
+          (camera.top - camera.bottom) / 2 / camera.zoom;
       if (needsResizing) {
         // we update lastZoom here as it will be scheduled
         item.lastZoom = zoom;
