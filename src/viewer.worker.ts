@@ -61,10 +61,15 @@ const init = (
   const light = new THREE.AmbientLight(0xffffff);
   scene.add(light);
 
-  const elementCanvases: {
+  type ElementCube = {
+    element: NonDeletedExcalidrawElement;
     elementCanvas: HTMLCanvasElement;
     texture: THREE.CanvasTexture;
-  }[] = [];
+    geometry: THREE.PlaneGeometry;
+    cube: THREE.Mesh;
+    lastZoom: number;
+  };
+  const elementCubes: ElementCube[] = [];
   elements.forEach((element, index) => {
     const elementCanvas = (new OffscreenCanvas(
       0,
@@ -76,10 +81,6 @@ const init = (
     const h = y2 - y1 + CANVAS_PADDING * 2;
     const texture = new THREE.CanvasTexture(elementCanvas);
     texture.minFilter = THREE.LinearFilter;
-    elementCanvases[index] = {
-      elementCanvas,
-      texture,
-    };
     const material = new THREE.MeshBasicMaterial({
       map: texture,
       transparent: true,
@@ -92,6 +93,14 @@ const init = (
       -(scrollY + y1 + (y2 - y1) / 2) + height / 2,
       -height / 4 + (height / 2 / elements.length) * index
     );
+    elementCubes[index] = {
+      element,
+      elementCanvas,
+      texture,
+      geometry,
+      cube,
+      lastZoom: 1,
+    };
   });
 
   const camera = new THREE.OrthographicCamera(
@@ -103,24 +112,55 @@ const init = (
     height
   );
 
+  const getResizingElementCubes = (zoom: number) =>
+    elementCubes.filter((item) => {
+      const { geometry, cube, lastZoom } = item;
+      if (lastZoom === zoom) return false;
+      const { width, height } = geometry.parameters;
+      const { x, y } = cube.position;
+      const needsResizing = (
+        Math.abs(x - (camera.left + camera.right) / 2) - width / 2 <
+          (camera.right - camera.left) / 2 / camera.zoom &&
+        Math.abs(y - (camera.bottom + camera.top) / 2) - height / 2 <
+          (camera.top - camera.bottom) / 2 / camera.zoom
+      );
+      if (needsResizing) {
+        // we update lastZoom here as it will be scheduled
+        item.lastZoom = zoom;
+        return true;
+      }
+      return false;
+    });
+
   let currZoom = 1;
-  const redrawElements = (index: number, zoom: number) => {
+  const BATCH_SIZE = 100;
+  const redrawElements = (
+    resizingElementCubes: ElementCube[],
+    index: number,
+    zoom: number
+  ) => {
     if (zoom !== currZoom) {
       // no longer valid
-      return;
+      return false;
     }
-    if (index >= elements.length) {
-      // rerender
+    let i = 0;
+    while (i < BATCH_SIZE && index + i < resizingElementCubes.length) {
+      const { element, elementCanvas } = resizingElementCubes[index + i];
+      drawElementCanvas(element, elementCanvas, scale * zoom);
+      i += 1;
+    }
+    if (index + i >= resizingElementCubes.length) {
+      resizingElementCubes.forEach(({ texture }) => {
+        texture.needsUpdate = true;
+      });
+      // XXX this takes time with many elements needing updates
       renderer.render(scene, camera);
-      return;
+      return true; // rendered
     }
-    const element = elements[index];
-    const { elementCanvas, texture } = elementCanvases[index];
-    drawElementCanvas(element, elementCanvas, scale * zoom);
-    texture.needsUpdate = true;
     setTimeout(() => {
-      redrawElements(index + 1, zoom);
+      redrawElements(resizingElementCubes, index + i, zoom);
     }, 1);
+    return false; // not rendered
   };
 
   render = throttle(
@@ -134,10 +174,14 @@ const init = (
       camera.position.z = (height / 2) * Math.cos(viewAngle);
       camera.position.y = -(height / 2) * Math.sin(viewAngle);
       camera.lookAt(0, 0, 0);
-      renderer.render(scene, camera);
-      if (currZoom !== zoom) {
+      const resizingElementCubes = getResizingElementCubes(zoom);
+      let rendered = false;
+      if (resizingElementCubes.length) {
         currZoom = zoom;
-        redrawElements(0, zoom);
+        rendered = redrawElements(resizingElementCubes, 0, zoom);
+      }
+      if (!rendered) {
+        renderer.render(scene, camera);
       }
     },
     50
