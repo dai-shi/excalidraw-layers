@@ -16,7 +16,8 @@ const Viewer: React.FC<Props> = ({ elements }) => {
       const canvas = canvasRef.current;
       const width = canvas.parentElement?.clientWidth || 300;
       const height = canvas.parentElement?.clientHeight || 300;
-      const worker = new Worker("./viewer.worker", { type: "module" });
+      // https://github.com/GoogleChromeLabs/worker-plugin/issues/43
+      const worker = new Worker("./viewer.worker", { name: "x", type: "module" });
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       const offscreen = canvas.transferControlToOffscreen();
