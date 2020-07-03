@@ -1,0 +1,2 @@
+(this["webpackJsonpexcalidraw-layers"]=this["webpackJsonpexcalidraw-layers"]||[]).push([[30],{85:function(a,e,s){a.exports=s.p+"static/media/README.ebec7061.md"}}]);
+//# sourceMappingURL=30.f96d903e.chunk.js.map
