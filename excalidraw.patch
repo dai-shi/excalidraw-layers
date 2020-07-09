@@ -1,8 +1,8 @@
 diff --git a/src/i18n.ts b/src/i18n.ts
-index 474d87a..cb4ac6d 100644
+index 2be7ea0..2374842 100644
 --- a/src/i18n.ts
 +++ b/src/i18n.ts
-@@ -48,7 +48,9 @@ export const setLanguage = (newLng: string | undefined) => {
+@@ -60,7 +60,9 @@ export const setLanguage = async (newLng: string | undefined) => {
    currentLanguage =
      languages.find((language) => language.lng === newLng) || fallbackLanguage;
  
@@ -11,10 +11,10 @@ index 474d87a..cb4ac6d 100644
 +    document.documentElement.dir = currentLanguage.rtl ? "rtl" : "ltr";
 +  } catch (e) {}
  
-   languageDetector.cacheUserLanguage(currentLanguage.lng);
- };
+   currentLanguageData = await import(`./locales/${currentLanguage.data}`);
+ 
 diff --git a/src/keys.ts b/src/keys.ts
-index 3b181ad..7bf039f 100644
+index 07cce39..4f652da 100644
 --- a/src/keys.ts
 +++ b/src/keys.ts
 @@ -1,4 +1,6 @@
