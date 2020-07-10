@@ -132,7 +132,7 @@ const init = (
     });
 
   let currZoom = 1;
-  const BATCH_SIZE = 100;
+  const BATCH_SIZE = 20;
   const redrawElements = (
     resizingElementCubes: ElementCube[],
     index: number,
@@ -140,26 +140,24 @@ const init = (
   ) => {
     if (zoom !== currZoom) {
       // no longer valid
-      return false;
+      return;
     }
     let i = 0;
     while (i < BATCH_SIZE && index + i < resizingElementCubes.length) {
-      const { element, elementCanvas } = resizingElementCubes[index + i];
+      const { element, elementCanvas, texture } = resizingElementCubes[
+        index + i
+      ];
       drawElementCanvas(element, elementCanvas, scale * zoom);
+      texture.needsUpdate = true;
       i += 1;
     }
+    renderer.render(scene, camera);
     if (index + i >= resizingElementCubes.length) {
-      resizingElementCubes.forEach(({ texture }) => {
-        texture.needsUpdate = true;
-      });
-      // XXX this takes time with many elements needing updates
-      renderer.render(scene, camera);
-      return true; // rendered
+      return;
     }
     setTimeout(() => {
       redrawElements(resizingElementCubes, index + i, zoom);
     }, 1);
-    return false; // not rendered
   };
 
   let lastData: {
@@ -195,14 +193,13 @@ const init = (
       camera.position.z = (height / 2) * Math.cos(viewAngle);
       camera.position.y = -(height / 2) * Math.sin(viewAngle);
       camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
       const resizingElementCubes = getResizingElementCubes(zoom);
-      let rendered = false;
       if (resizingElementCubes.length) {
         currZoom = zoom;
-        rendered = redrawElements(resizingElementCubes, 0, zoom);
-      }
-      if (!rendered) {
-        renderer.render(scene, camera);
+        setTimeout(() => {
+          redrawElements(resizingElementCubes, 0, zoom);
+        }, 1);
       }
       setTimeout(renderLoop, 0);
     } else {
