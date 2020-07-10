@@ -2,7 +2,6 @@
 
 import rough from "roughjs/bin/rough";
 import * as THREE from "three";
-import throttle from "lodash.throttle";
 
 import { NonDeletedExcalidrawElement } from "./excalidraw/src/element/types";
 import { SceneState } from "./excalidraw/src/scene/types";
@@ -163,8 +162,30 @@ const init = (
     return false; // not rendered
   };
 
-  render = throttle(
-    (viewAngle: number, zoom: number, centerX: number, centerY: number) => {
+  let lastData: {
+    viewAngle: number;
+    zoom: number;
+    centerX: number;
+    centerY: number;
+  } | null = {
+    viewAngle: 0,
+    zoom: currZoom,
+    centerX: 0,
+    centerY: 0,
+  };
+  render = (
+    viewAngle: number,
+    zoom: number,
+    centerX: number,
+    centerY: number
+  ) => {
+    lastData = { viewAngle, zoom, centerX, centerY };
+  };
+
+  const renderLoop = () => {
+    if (lastData) {
+      const { viewAngle, zoom, centerX, centerY } = lastData;
+      lastData = null;
       camera.zoom = zoom;
       camera.left = -width / 2 + centerX;
       camera.right = width / 2 + centerX;
@@ -183,10 +204,12 @@ const init = (
       if (!rendered) {
         renderer.render(scene, camera);
       }
-    },
-    50
-  );
-  render(0, currZoom, 0, 0);
+      setTimeout(renderLoop, 0);
+    } else {
+      setTimeout(renderLoop, 50);
+    }
+  };
+  renderLoop();
 };
 
 self.onmessage = (event: MessageEvent) => {
