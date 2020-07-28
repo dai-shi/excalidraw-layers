@@ -11,15 +11,17 @@ This is an experimental tool to view layers of
 
 ## How to use it
 
-Just visit <https://dai-shi.github.io/excalidraw-layers>
+Just visit <https://dai-shi.github.io/excalidraw-layers> using Google Chrome.
 
-and enter the link in the field and click "View Layers!"
+Load file, or enter the link in the field and click "View".
 
 You can then Shift-scroll to change view angle to see layers.
 
 ## Tweets
 
 - [Initial Annoucement](https://twitter.com/dai_shi/status/1271080071613149185)
+- [Resize Experiment](https://twitter.com/dai_shi/status/1277060881747066881)
+- [10,000 Elements](https://twitter.com/dai_shi/status/1281428956286091265)
 
 ## Other projects with Excalidraw
 
