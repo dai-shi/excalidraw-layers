@@ -23,7 +23,7 @@
     "i18next-browser-languagedetector": "^5.0.0",
     "jest-canvas-mock": "^2.2.0",
     "lodash.throttle": "^4.1.1",
-    "nanoid": "^2.1.11",
+    "nanoid": "^3.1.31",
     "node-sass": "^4.14.1",
     "open-color": "^1.7.0",
     "pepjs": "^0.5.2",
