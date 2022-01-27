@@ -35,7 +35,7 @@
     "react-scripts": "3.4.1",
     "roughjs": "^4.3.1",
     "socket.io-client": "^2.3.0",
-    "three": "^0.125.0",
+    "three": "^0.137.0",
     "typescript": "^3.9.6",
     "worker-plugin": "^4.0.3"
   },
